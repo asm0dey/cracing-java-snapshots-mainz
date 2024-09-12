@@ -16,7 +16,7 @@ extensions: [terminal]
 * JVM developer: Java and Kotlin <!-- stop --> (and actually Clojure, Scala, Ceylon) <!-- stop -->
 * DevOps is not a person, but I could be! <!-- stop -->
 * Long-time Linux User <!-- stop --> (Did I say I'm a geek?) <!-- stop -->
-* When life gives me lemonade, I squeeze a presentation!
+* When life gives me terminal, I squeeze a presentation!
 
 ---
 
