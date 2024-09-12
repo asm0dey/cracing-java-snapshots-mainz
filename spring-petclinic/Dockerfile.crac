@@ -1,0 +1,18 @@
+# syntax=docker/dockerfile:1-labs
+FROM bellsoft/liberica-runtime-container:jdk-musl as builder
+
+COPY . /app
+RUN cd /app && ./gradlew build -xtest
+
+FROM bellsoft/liberica-runtime-container:jre-crac-slim as optimizer
+
+COPY --from=builder /app/build/libs/spring-petclinic-3.3.0.jar /app/app.jar
+WORKDIR /app
+RUN --security=insecure java -Dspring.context.checkpoint=onRefresh -XX:CRaCCheckpointTo=/checkpoint -jar /app/app.jar || true
+
+FROM bellsoft/liberica-runtime-container:jre-crac-slim as runner
+
+COPY --from=optimizer /app/app.jar /app/app.jar
+ENTRYPOINT java -XX:CRaCRestoreFrom=/checkpoint
+COPY --from=optimizer /checkpoint /checkpoint
+
