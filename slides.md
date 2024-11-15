@@ -3,6 +3,7 @@ title: CRaCing Java Snapshots
 author: "@asm0di0"
 extensions: [terminal]
 ---
+
 # Cracking Java Snapshots
 
 ## Pasha Finkelshteyn
@@ -11,12 +12,12 @@ extensions: [terminal]
 
 # `whoami`?
 
-* Geek <!-- stop -->
-* Developer 🥑 at Bellsoft <!-- stop --> (we'll talk about it later) <!--  stop -->
-* JVM developer: Java and Kotlin <!-- stop --> (and actually Clojure, Scala, Ceylon) <!-- stop -->
-* DevOps is not a person, but I could be! <!-- stop -->
-* Long-time Linux User <!-- stop --> (Did I say I'm a geek?) <!-- stop -->
-* When life gives me terminal, I squeeze a presentation!
+- Geek <!-- stop -->
+- Developer 🥑 at Bellsoft <!-- stop --> (we'll talk about it later) <!--  stop -->
+- JVM developer: Java and Kotlin <!-- stop --> (and actually Clojure, Scala, Ceylon) <!-- stop -->
+- DevOps is not a person, but I could be! <!-- stop -->
+- Long-time Linux User <!-- stop --> (Did I say I'm a geek?) <!-- stop -->
+- When life gives me terminal, I squeeze a presentation!
 
 ---
 
@@ -29,6 +30,7 @@ Because Java is slow ;) <!-- stop -->
 Just kidding. <!-- stop --> But applications actually are!
 
 <!-- stop -->
+
 ```plain
 Started PetClinicApplication in 4.932 HOURS
 ```
@@ -57,10 +59,10 @@ init_codeblock_lang: bash
 
 https://criu.org/Main_Page
 
-> Checkpoint/Restore In Userspace, or **CRIU** (pronounced kree-oo, IPA: /krɪʊ/, Russian: криу), 
-is a Linux software. It can freeze a running container (or an individual application) and 
-checkpoint its state to disk. The data saved can be used to restore the application and 
-run it exactly as it was during the time of the freeze
+> Checkpoint/Restore In Userspace, or **CRIU** (pronounced kree-oo, IPA: /krɪʊ/, Russian: криу),
+> is a Linux software. It can freeze a running container (or an individual application) and
+> checkpoint its state to disk. The data saved can be used to restore the application and
+> run it exactly as it was during the time of the freeze
 
 ---
 
@@ -74,15 +76,19 @@ for i in $(seq 1 10000); do
   sleep 1
 done
 ```
+
 <!-- stop -->
 
 Run it: `./my.sh`
+
 <!-- stop -->
 
 Wait some time
+
 <!-- stop -->
 
-CRIU it: `criu --shell-job dump $(pidof -x ./my.sh)`
+CRIU it: `criu --shell-job dump -t $(pidof -x ./my.sh)`
+
 <!-- stop -->
 
 Restore it: `criu --shell-job restore`
@@ -117,10 +123,10 @@ But this talk wouldn't be a thing, right?
 
 https://openjdk.org/projects/crac/
 
-> The CRaC (Coordinated Restore at Checkpoint) Project researches coordination of Java programs with mechanisms 
-to checkpoint (make an image of, snapshot) a Java instance while it is executing. Restoring from the image could 
-be a solution to some of the problems with the start-up and warm-up times. The primary aim of the Project is to 
-develop a new standard mechanism-agnostic API to notify Java programs about the checkpoint and restore events
+> The CRaC (Coordinated Restore at Checkpoint) Project researches coordination of Java programs with mechanisms
+> to checkpoint (make an image of, snapshot) a Java instance while it is executing. Restoring from the image could
+> be a solution to some of the problems with the start-up and warm-up times. The primary aim of the Project is to
+> develop a new standard mechanism-agnostic API to notify Java programs about the checkpoint and restore events
 
 ---
 
@@ -135,6 +141,10 @@ Some JDKs include it, for example Liberica JDK
 <blink>Advertising space for rent:</blink>
 
 https://bell-sw.com/pages/downloads/#jdk-21-lts
+
+<!-- stop -->
+
+_CRaC is first implemented by Azul, we support its fork_
 
 ---
 
@@ -154,6 +164,7 @@ public static void main(String args[]) throws InterruptedException {
   }
 }
 ```
+
 ---
 
 # CRaC example
@@ -167,6 +178,7 @@ public static void main(String args[]) throws InterruptedException {
   }
 }
 ```
+
 ---
 
 # CRaC example
@@ -191,6 +203,7 @@ public static void main(String args[]) throws InterruptedException {
 ```terminal7
 cat crac2/Dockerfile
 ```
+
 <!-- stop -->
 
 ```terminal-ex
@@ -205,6 +218,45 @@ init_text: docker build -t pre_crack -f crac2/Dockerfile crac2
 ---
 
 # Now let's crack it and launch from snapshot!
+
+```shell
+docker run --cap-add CAP_SYS_PTRACE --cap-add CAP_CHECKPOINT_RESTORE -d pre_crack
+```
+
+<!-- stop -->
+
+- `CAP_SYS_PTRACE`: we need to access the whole process tree <!-- stop -->
+- `CAP_CHECKPOINT_RESTORE`: somehow there is a special cap for this
+
+<!-- stop -->
+
+I do not add `--rm` because we will need the image later
+
+---
+
+# Now let's crack it and launch from snapshot!
+
+```shell
+CRACING=$(docker run --cap-add CAP_SYS_PTRACE --cap-add CAP_CHECKPOINT_RESTORE -d pre_crack)
+docker exec -it $CRACING jcmd 129 JDK.checkpoint
+docker commit $CRACING post_crack
+```
+
+<!-- stop -->
+
+Let's look into our creation
+
+```shell
+dive post_crack
+```
+
+<!-- stop -->
+
+And run it!
+
+```shell
+docker run --rm --entrypoint java post_crack -XX:CRaCRestoreFrom=/app/checkpoint
+```
 
 ---
 
@@ -244,20 +296,22 @@ Demo
 
 1. CRaC allows to startup any software almost instantly
 2. Building Docker with CRaC is not simple but doable
-    1. Build jar
-    2. Build docker with this jar startup in entrypoint
-    3. Run image with `--privileged`
-    4. Checkpoint it
-    5. Commit
+   1. Build jar
+   2. Build docker with this jar startup in entrypoint
+   3. Run image with `--privileged` or with `--cap-add`
+   4. Checkpoint it
+   5. Commit
 3. To support custom things in application we should
-    1. Implement `Resource`
-    2. Register it in `Core`
+   1. Implement `Resource`
+   2. Register it in `Core`
 
 ---
 
 # Thank you! Questions?
 
-* Twitter:  @asm0di0
-* Mastodon: @asm0dey@fosstodon.org
-* LinkedIn: @asm0dey
-* E-mail:   me@asm0dey.site
+- Site: https://asm0dey.site
+- Bluesky: @asm0dey
+- Twitter : @asm0di0
+- Mastodon: @asm0dey@fosstodon.org
+- LinkedIn: @asm0dey
+- E-mail : me@asm0dey.site
