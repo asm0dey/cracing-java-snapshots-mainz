@@ -28,9 +28,6 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("org.crac:crac:1.5.0")
-    implementation("com.squareup.okhttp3:okhttp-sse:4.10.0")
-    implementation("dev.manpreet:apache-sseclient:1.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
 }
 
 kotlin {

@@ -6,9 +6,6 @@ import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToFlow
-import org.springframework.web.reactive.function.client.bodyToFlux
-import reactor.core.Disposable
 
 @SpringBootApplication
 @EnableScheduling
@@ -18,17 +15,24 @@ fun main(args: Array<String>) {
     runApplication<MyApp>(*args)
 }
 
+const val LAST_EDIT_URL = "https://stream.wikimedia.org/v2/stream/recentchange"
+
 @RestController
-class LastMessageController {
-    var data = ""
-    private final val stream = run {
-        val client = WebClient.create("https://stream.wikimedia.org/v2/stream")
-        client.get().uri("/recentchange").retrieve().bodyToFlux<String>()
-    }
+class SseReader {
+    private val client = WebClient.create(LAST_EDIT_URL)
+    private var lastData: String? = null
+    private val dataFlux = client.get()
+        .retrieve()
+        .bodyToFlux(String::class.java)
+        .doOnNext { lastData = it }
+
     init {
-        stream.subscribe { data = it }
+        dataFlux.subscribe()
     }
 
-    @GetMapping("/")
-    fun data() = data
+    @GetMapping("/last-data")
+    fun getLastData(): String? {
+        return lastData
+    }
 }
+
