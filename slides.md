@@ -14,10 +14,10 @@ extensions: [terminal]
 
 - Geek <!-- stop -->
 - Developer 🥑 at Bellsoft <!-- stop --> (we'll talk about it later) <!--  stop -->
-- JVM developer: Java and Kotlin <!-- stop --> (and actually Clojure, Scala, Ceylon) <!-- stop -->
+- JVM developer: Java and Kotlin <!-- stop --> (and actually Clojure, Scala, Ceylon 😱) <!-- stop -->
 - DevOps is not a person, but I could be! <!-- stop -->
 - Long-time Linux User <!-- stop --> (Did I say I'm a geek?) <!-- stop -->
-- When life gives me terminal, I squeeze a presentation!
+- If life gives me a terminal, I have to make a presentation
 
 ---
 
@@ -145,6 +145,15 @@ https://bell-sw.com/pages/downloads/#jdk-21-lts
 <!-- stop -->
 
 _CRaC is first implemented by Azul, we support its fork_
+
+---
+
+# What I do and what I do not
+
+- I say CRaC is nice
+- I do not say there are no other solutions
+- I say developer experience and productivity are good with CRaC
+- I do not hide downsides of CRaC, but please ask me if I forgot something
 
 ---
 
