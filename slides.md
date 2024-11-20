@@ -1,6 +1,6 @@
 ---
 title: CRaCing Java Snapshots
-author: "@asm0di0"
+author: "bsky: @asm0dey.site"
 extensions: [terminal]
 ---
 
@@ -17,7 +17,22 @@ extensions: [terminal]
 - JVM developer: Java and Kotlin <!-- stop --> (and actually Clojure, Scala, Ceylon 😱) <!-- stop -->
 - DevOps is not a person, but I could be! <!-- stop -->
 - Long-time Linux User <!-- stop --> (Did I say I'm a geek?) <!-- stop -->
-- If life gives me a terminal, I have to make a presentation
+- If life gives me a terminal 🍋, I have to make a presentation 🥛
+
+---
+
+# BellSoft
+
+https://bell-sw.com
+
+- Created in 2017 to support ARM32 builds of OpenJDK
+- Contributes to OpenJDK (and GraalVM)
+- Has 2 main products: Liberica JDK and Alpaquita Linux
+- Has a flavour of Liberica with CRaC support
+- Major clients include Visa, RSA, Broadcom
+- Liberica is officially recommended by Spring
+
+
 
 ---
 
@@ -209,8 +224,13 @@ public static void main(String args[]) throws InterruptedException {
 
 # CRaC Example
 
-```terminal7
-cat crac2/Dockerfile
+```docker
+FROM bellsoft/liberica-runtime-container:jdk-crac-slim
+
+ADD Example.java /app/Example.java
+WORKDIR /app
+RUN javac Example.java
+ENTRYPOINT java -XX:CRaCCheckpointTo=/app/checkpoint Example
 ```
 
 <!-- stop -->
@@ -234,21 +254,23 @@ docker run --cap-add CAP_SYS_PTRACE --cap-add CAP_CHECKPOINT_RESTORE -d pre_crac
 
 <!-- stop -->
 
-- `CAP_SYS_PTRACE`: we need to access the whole process tree <!-- stop -->
+- `CAP_SYS_PTRACE`: we need to access the whole process tree
+  > transfer data to or from the memory of arbitrary processes using process_vm_readv(2) and process_vm_writev(2) <!-- stop -->
 - `CAP_CHECKPOINT_RESTORE`: somehow there is a special cap for this
+  > Update /proc/sys/kernel/ns_last_pid; Read the contents of the symbolic links in /proc/pid/map_files for other processes
 
 <!-- stop -->
 
-I do not add `--rm` because we will need the image later
+**Do not add `--rm`, we'll need this image later**
 
 ---
 
 # Now let's crack it and launch from snapshot!
 
 ```shell
-CRACING=$(docker run --cap-add CAP_SYS_PTRACE --cap-add CAP_CHECKPOINT_RESTORE -d pre_crack)
-docker exec -it $CRACING jcmd 129 JDK.checkpoint
-docker commit $CRACING post_crack
+ID=$(docker run --cap-add CAP_SYS_PTRACE --cap-add CAP_CHECKPOINT_RESTORE -d pre_crack)
+docker exec -it $ID jcmd 129 JDK.checkpoint
+docker commit $ID post_crack
 ```
 
 <!-- stop -->
@@ -318,9 +340,9 @@ Demo
 
 # Thank you! Questions?
 
-- Site: https://asm0dey.site
-- Bluesky: @asm0dey
+- Site    : https://asm0dey.site
+- Bluesky : @asm0dey.site
 - Twitter : @asm0di0
 - Mastodon: @asm0dey@fosstodon.org
 - LinkedIn: @asm0dey
-- E-mail : me@asm0dey.site
+- E-mail  : me@asm0dey.site
